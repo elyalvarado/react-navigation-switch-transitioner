@@ -1,0 +1,25 @@
+{
+  "parser": "babel-eslint",
+  "extends": ["airbnb", "prettier"],
+  "globals": {
+    "__DEV__": false
+  },
+  "rules": {
+    "react/jsx-filename-extension": [1, { "extensions": [".js"] }],
+    "react/no-unescaped-entities": ["error", { "forbid": [">", "}"] }],
+    "react/destructuring-assignment": [
+      "on",
+      "always",
+      { "ignoreClassFields": true }
+    ],
+    "no-underscore-dangle": "off",
+    "no-console": "off"
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".ios.js", ".android.js"]
+      }
+    }
+  }
+}
