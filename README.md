@@ -14,18 +14,26 @@ yarn add react-navigation-switch-transitioner
 
 ## Usage
 
-Create your Switch Navigator. It takes the same parameters than the react-navigation one.
+Create your Switch Navigator with the same parameters than the react-navigation one.
+
+There are 2 options to add transitions to your Screens:
+
+### Option 1: Using the provided HOC
+
+This library provides two HOCs: `withTransition` and `withFadeTransition` which you can use to wrap your screens. The first one allows you to inject any transition to your screen, while the second one uses the provided FadeTransition.
 
 ```js
-import { createSwitchNavigator } from 'react-navigation-switch-transitioner'
+import { createSwitchNavigator, FadeTransition, withTransition, withFadeTransition } from 'react-navigation-switch-transitioner'
 
 export default createSwitchNavigator({
-  Inbox: InboxScreen
-  Drafts: DraftsScreen,
+  Inbox: withTransition(FadeTransition)(InboxScreen)
+  Drafts: withFadeTransition(DraftsScreen),
 }, {
   initialRouteName: 'Inbox',
 })
 ```
+
+### Option 2: Wrap your screens with a transition component
 
 If you want your screens to Fade on transitioning to/from them, wrap them in the FadeTransition component and expose its navigationOptions (don't forget to pass the received props to the FadeTransition)
 
@@ -56,6 +64,8 @@ class DraftScreen extends React.Component {
 ## Docs
 
 It is mostly compatible with the react-navigation `SwitchNavigator` so the best place to start while documention is created is the [React Navigation website](https://reactnavigation.org/docs/en/switch-navigator.html).
+
+## Implementing your own Transitions
 
 If you want to implement your own transition take a look at the source code for the FadeTransition.
 

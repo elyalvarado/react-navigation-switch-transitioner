@@ -27,4 +27,15 @@ module.exports = {
   get Transitioner() {
     return require('./views/Transitioner').default
   },
+
+  /**
+   * HOCs
+   */
+  get withTransition() {
+    return require('./utils/withTransition').default
+  },
+
+  get withFadeTransition() {
+    return require('./utils/withTransition').withFadeTransition
+  },
 }

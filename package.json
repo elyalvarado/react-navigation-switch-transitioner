@@ -1,6 +1,6 @@
 {
   "name": "react-navigation-switch-transitioner",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A react-navigation transitioner and switch navigator using it",
   "repository": "https://https://github.com/elyalvarado/react-navigation-switch-transitioner",
   "author": "Ely Alvarado",
@@ -31,7 +31,9 @@
     "url": "https://github.com/elyalvarado/react-navigation-switch-transitioner/issues"
   },
   "homepage": "https://github.com/elyalvarado/react-navigation-switch-transitioner#readme",
-  "dependencies": {},
+  "dependencies": {
+    "hoist-non-react-statics": "^3.0.1"
+  },
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-jest": "^22.4.1",

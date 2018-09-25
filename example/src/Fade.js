@@ -8,6 +8,7 @@ import {
 import {
   FadeTransition,
   createSwitchNavigator,
+  withFadeTransition,
 } from 'react-navigation-switch-transitioner'
 
 const View = props => {
@@ -28,6 +29,7 @@ const Text = props => (
   <UnstyledText style={{ textAlign: 'center' }} {...props} />
 )
 
+// Screen without transition
 class HomeScreen extends React.Component {
   render() {
     const { navigation } = this.props
@@ -51,6 +53,7 @@ class HomeScreen extends React.Component {
   }
 }
 
+// Screen with manually defined transition
 class AnotherScreen extends React.Component {
   static navigationOptions = FadeTransition.navigationOptions
 
@@ -78,30 +81,27 @@ class AnotherScreen extends React.Component {
   }
 }
 
+// Screen wrapped in the router confing with a HOC that provides a transition
 class ProfileScreen extends React.Component {
-  static navigationOptions = FadeTransition.navigationOptions
-
   render() {
     const { navigation } = this.props
     return (
-      <FadeTransition {...this.props}>
-        <View>
-          <Text>
-            {navigation.getParam('name')}
-            's Profile
-          </Text>
-          <Button
-            onPress={() => {
-              navigation.navigate('AnotherScreen')
-            }}
-            title="Go to Another"
-          />
-          <Button
-            onPress={() => navigation.navigate('HomeScreen')}
-            title="Go Home"
-          />
-        </View>
-      </FadeTransition>
+      <View>
+        <Text>
+          {navigation.getParam('name')}
+          's Profile
+        </Text>
+        <Button
+          onPress={() => {
+            navigation.navigate('AnotherScreen')
+          }}
+          title="Go to Another"
+        />
+        <Button
+          onPress={() => navigation.navigate('HomeScreen')}
+          title="Go Home"
+        />
+      </View>
     )
   }
 }
@@ -110,7 +110,7 @@ export default createSwitchNavigator(
   {
     HomeScreen,
     AnotherScreen,
-    ProfileScreen,
+    ProfileScreen: withFadeTransition(ProfileScreen),
   },
   {
     initialRouteName: 'HomeScreen',
