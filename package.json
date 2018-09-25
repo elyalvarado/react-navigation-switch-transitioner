@@ -28,9 +28,9 @@
     "navigator"
   ],
   "bugs": {
-    "url": "https://https://github.com/elyalvarado/react-navigation-switch-transitioner/issues"
+    "url": "https://github.com/elyalvarado/react-navigation-switch-transitioner/issues"
   },
-  "homepage": "https://https://github.com/elyalvarado/react-navigation-switch-transitioner#readme",
+  "homepage": "https://github.com/elyalvarado/react-navigation-switch-transitioner#readme",
   "dependencies": {},
   "devDependencies": {
     "babel-cli": "^6.26.0",

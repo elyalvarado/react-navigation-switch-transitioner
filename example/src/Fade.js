@@ -1,4 +1,4 @@
-/* eslint-disable react/no-multi-comp, import/no-unresolved */
+/* eslint-disable react/no-multi-comp, import/no-unresolved, react/prefer-stateless-function */
 import React from 'react'
 import {
   Button,
