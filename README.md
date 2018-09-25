@@ -30,7 +30,7 @@ export default createSwitchNavigator({
 If you want your screens to Fade on transitioning to/from them, wrap them in the FadeTransition component and expose its navigationOptions (don't forget to pass the received props to the FadeTransition)
 
 ```js
-import { createSwitchNavigator } from 'react-navigation-switch-transitioner'
+import { FadeTransition } from 'react-navigation-switch-transitioner'
 
 class DraftScreen extends React.Component {
   static navigationOptions = FadeTransition.navigationOptions
