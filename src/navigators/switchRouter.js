@@ -11,6 +11,7 @@ export default (routeConfigs, config = {}) => {
 
     if (
       action.type === NavigationActions.NAVIGATE &&
+      newState && // There is a state change
       routeKeys && // Routes are defined
       routeKeys.includes(action.routeName) && // Is one of my routes
       !action.action // And there is no sub-action
@@ -26,7 +27,6 @@ export default (routeConfigs, config = {}) => {
 
     if (
       action.type === StackActions.COMPLETE_TRANSITION &&
-      (action.key == null || action.key === state.key) &&
       state.isTransitioning
     ) {
       return {
