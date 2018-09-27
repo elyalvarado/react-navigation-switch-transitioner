@@ -233,7 +233,6 @@ export default class Transitioner extends React.Component {
       <Animated.View
         style={[...style, { ...backScreenStyles }]}
         pointerEvents="auto"
-        key={activeKey}
       >
         <NavigationProvider value={incomingDescriptor.navigation}>
           {OutgoingScreen ? (
