@@ -10,6 +10,7 @@ import {
   createSwitchNavigator,
   withFadeTransition,
 } from 'react-navigation-switch-transitioner'
+import { createStackNavigator } from 'react-navigation'
 
 const View = props => {
   const { style, ...propsNoStyle } = props
@@ -106,9 +107,13 @@ class ProfileScreen extends React.Component {
   }
 }
 
+const AnotherNavigator = createStackNavigator({
+  HomeScreen,
+})
+
 export default createSwitchNavigator(
   {
-    HomeScreen,
+    HomeScreen: AnotherNavigator,
     AnotherScreen,
     ProfileScreen: withFadeTransition(ProfileScreen),
   },

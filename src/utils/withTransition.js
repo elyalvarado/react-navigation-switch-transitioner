@@ -13,6 +13,7 @@ const withTransition = Transition => Screen => {
         transitionRouteKey,
         transitioningFromState,
         transitioningToState,
+        style,
         ...nonTransitionProps
       } = this.props
       return (

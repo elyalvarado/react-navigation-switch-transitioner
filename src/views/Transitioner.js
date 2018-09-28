@@ -204,15 +204,24 @@ export default class Transitioner extends React.Component {
     const activeKey = navState.routes[navState.index].key
     const incomingDescriptor =
       descriptors[activeKey] || transitioningFromDescriptors[activeKey]
+    const incomingOptions = incomingDescriptor && incomingDescriptor.options
+    const incomingHasManagedTransition =
+      incomingOptions &&
+      incomingOptions.runTransition &&
+      incomingOptions.createTransition
     const incomingTransition = transitions[activeKey]
     const IncomingScreen = incomingDescriptor.getComponent()
     const transitioningToState = transitionRouteKey ? navigation.state : null
 
     const oldKey =
-      transitionRouteKey &&
       transitioningFromState &&
       transitioningFromState.routes[transitioningFromState.index].key
     const outgoingDescriptor = oldKey && transitioningFromDescriptors[oldKey]
+    const outgoingOptions = outgoingDescriptor && outgoingDescriptor.options
+    const outgoingHasManagedTransition =
+      outgoingOptions &&
+      outgoingOptions.runTransition &&
+      outgoingOptions.createTransition
     const outgoingTransition = oldKey && transitions[oldKey]
     const OutgoingScreen =
       outgoingDescriptor && outgoingDescriptor.getComponent()
@@ -225,9 +234,31 @@ export default class Transitioner extends React.Component {
       transitioningFromState,
       transitioningToState,
       transitionRouteKey,
-      screenProps,
       style,
     }
+
+    // We shouldn't pass down the managed transition props to other screens
+    // because it might cause propsValidation errors. This was happening with
+    // the navigators
+    const outgoingProps = outgoingHasManagedTransition
+      ? {
+          ...passdownProps,
+          transition: outgoingTransition,
+          screenProps,
+        }
+      : {
+          screenProps,
+        }
+
+    const incomingProps = incomingHasManagedTransition
+      ? {
+          ...passdownProps,
+          transition: incomingTransition,
+          screenProps,
+        }
+      : {
+          screenProps,
+        }
 
     return (
       <Animated.View
@@ -237,15 +268,15 @@ export default class Transitioner extends React.Component {
         <NavigationProvider value={incomingDescriptor.navigation}>
           {OutgoingScreen ? (
             <OutgoingScreen
-              transition={outgoingTransition}
+              {...outgoingProps}
               navigation={outgoingDescriptor.navigation}
-              {...passdownProps}
+              key={oldKey}
             />
           ) : null}
           <IncomingScreen
-            transition={incomingTransition}
+            {...incomingProps}
             navigation={incomingDescriptor.navigation}
-            {...passdownProps}
+            key={activeKey}
           />
         </NavigationProvider>
       </Animated.View>

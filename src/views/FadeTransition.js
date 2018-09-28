@@ -45,10 +45,11 @@ export default class FadeTransition extends React.Component {
       })
     }
 
-    return (
-      <Animated.View style={[...this.props.style, { flex: 1, opacity }]}>
-        {this.props.children}
-      </Animated.View>
-    )
+    const transitionStyle = [{ flex: 1, opacity }]
+    const style = this.props.style
+      ? [...this.props.style, ...transitionStyle]
+      : [...transitionStyle]
+
+    return <Animated.View style={style}>{this.props.children}</Animated.View>
   }
 }
