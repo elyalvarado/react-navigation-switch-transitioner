@@ -3,8 +3,7 @@ import { StyleSheet } from 'react-native'
 import Animated from 'react-native-reanimated'
 import { StackActions, NavigationProvider } from 'react-navigation'
 
-const getTransitionOwnerRouteKey = (fromState, toState) =>
-  toState.routes[toState.index].key
+const getKey = navState => navState.routes[navState.index].key
 
 const defaultCreateTransition = transition => ({ ...transition })
 
@@ -12,7 +11,7 @@ const defaultRunTransition = () => {}
 
 const getStateForNavChange = (props, state) => {
   // by this point we know the nav state has changed and it is safe to provide a new state. static
-  // getDerivedStateFromProps will never interrupt a transition (when there is state.transitionRouteKey),
+  // getDerivedStateFromProps will never interrupt a transition (when there is state.isTransitioning),
   // and _runTransition runs this after the previous transition is complete.
   const { navigation } = props
   const nextNavState = navigation.state
@@ -21,8 +20,8 @@ const getStateForNavChange = (props, state) => {
   // If false, we set the state immediately without transition
   if (!nextNavState.isTransitioning) {
     return {
-      transitions: state.transitions,
-      transitionRouteKey: null,
+      isTransitioning: false,
+      transitions: {}, // state.transitions,
       transitioningFromState: null,
       transitioningFromDescriptors: null,
       navState: nextNavState,
@@ -30,26 +29,17 @@ const getStateForNavChange = (props, state) => {
     }
   }
 
-  // Get and/or create the current screen transition
-  const transitionRouteKey = getTransitionOwnerRouteKey(
-    state.navState,
-    nextNavState,
-  )
+  const toKey = getKey(nextNavState)
   const descriptor =
-    props.descriptors[transitionRouteKey] ||
-    state.descriptors[transitionRouteKey] ||
-    state.transitioningFromDescriptors[transitionRouteKey]
+    props.descriptors[toKey] ||
+    state.descriptors[toKey] ||
+    state.transitioningFromDescriptors[toKey]
   const { options } = descriptor
   const createTransition = options.createTransition || defaultCreateTransition
-  const transition =
-    state.transitions[transitionRouteKey] ||
-    createTransition({
-      navigation: props.navigation,
-      transitionRouteKey,
-    })
+  const transition = createTransition({ navigation: props.navigation })
 
   // Get and create the previous screen transition
-  const fromKey = state.navState.routes[state.navState.index].key
+  const fromKey = getKey(state.navState)
   const fromDescriptor =
     props.descriptors[fromKey] ||
     state.descriptors[fromKey] ||
@@ -57,20 +47,14 @@ const getStateForNavChange = (props, state) => {
   const { options: fromOptions } = fromDescriptor
   const createFromTransition =
     fromOptions.createTransition || defaultCreateTransition
-  const fromTransition =
-    state.transitions[fromKey] ||
-    createFromTransition({
-      navigation: props.navigation,
-      fromKey,
-    })
+  const fromTransition = createFromTransition({ navigation: props.navigation })
 
   return {
+    isTransitioning: true,
     transitions: {
-      ...state.transitions,
-      [transitionRouteKey]: transition,
+      [toKey]: transition,
       [fromKey]: fromTransition,
     },
-    transitionRouteKey,
     transitioningFromState: state.navState,
     transitioningFromDescriptors: state.descriptors,
     navState: nextNavState,
@@ -80,10 +64,10 @@ const getStateForNavChange = (props, state) => {
 
 export default class Transitioner extends React.Component {
   state = {
+    // if this true, there is a transition in progress:
+    isTransitioning: false,
     // an object of transitions by route key
     transitions: {},
-    // if this is present, there is a transition in progress:
-    transitionRouteKey: null,
     // this will be the previous nav state and descriptors, when there is a transition in progress
     transitioningFromState: null,
     transitioningFromDescriptors: {},
@@ -98,7 +82,7 @@ export default class Transitioner extends React.Component {
       return state
     }
     // Never interrupt a transition in progress.
-    if (state.transitionRouteKey) {
+    if (state.isTransitioning) {
       return state
     }
 
@@ -106,10 +90,10 @@ export default class Transitioner extends React.Component {
   }
 
   componentDidUpdate(lastProps, lastState) {
-    const { transitionRouteKey, transitioningFromState } = this.state
+    const { isTransitioning, transitioningFromState } = this.state
     if (
       // If we are transitioning
-      transitionRouteKey &&
+      isTransitioning &&
       // And this is a new transition,
       lastState.transitioningFromState !== transitioningFromState
     ) {
@@ -139,7 +123,6 @@ export default class Transitioner extends React.Component {
     const { state } = this
     const {
       transitions,
-      transitionRouteKey,
       transitioningFromState,
       transitioningFromDescriptors,
       navState,
@@ -147,16 +130,14 @@ export default class Transitioner extends React.Component {
     } = state
 
     // get the current screen transition
-    const descriptor =
-      descriptors[transitionRouteKey] ||
-      transitioningFromDescriptors[transitionRouteKey]
+    const toKey = getKey(navState)
+    const descriptor = descriptors[toKey] || transitioningFromDescriptors[toKey]
     const { runTransition } = descriptor.options
     const run = runTransition || defaultRunTransition
-    const transition = transitions[transitionRouteKey]
+    const transition = transitions[toKey]
 
     // get the previous screen transition
-    const fromKey =
-      transitioningFromState.routes[transitioningFromState.index].key
+    const fromKey = getKey(transitioningFromState)
     const fromDescriptor =
       descriptor[fromKey] || transitioningFromDescriptors[fromKey]
     const { runTransition: runFromTransition } = fromDescriptor.options
@@ -176,7 +157,7 @@ export default class Transitioner extends React.Component {
     if (navState === this.props.navigation.state) {
       // Navigation state is currently the exact state we were transitioning to. Set final state and we're done
       this.setState({
-        transitionRouteKey: null,
+        isTransitioning: false,
         transitioningFromState: null,
         transitioningFromDescriptors: {},
         // navState and descriptors remain unchanged at this point.
@@ -192,7 +173,7 @@ export default class Transitioner extends React.Component {
   render() {
     const {
       transitions,
-      transitionRouteKey,
+      isTransitioning,
       transitioningFromState,
       transitioningFromDescriptors,
       navState,
@@ -201,7 +182,7 @@ export default class Transitioner extends React.Component {
     const { screenProps, navigation } = this.props
     const backScreenStyles = {} // FIX THIS:
 
-    const activeKey = navState.routes[navState.index].key
+    const activeKey = getKey(navState)
     const incomingDescriptor =
       descriptors[activeKey] || transitioningFromDescriptors[activeKey]
     const incomingOptions = incomingDescriptor && incomingDescriptor.options
@@ -211,11 +192,9 @@ export default class Transitioner extends React.Component {
       incomingOptions.createTransition
     const incomingTransition = transitions[activeKey]
     const IncomingScreen = incomingDescriptor.getComponent()
-    const transitioningToState = transitionRouteKey ? navigation.state : null
+    const transitioningToState = isTransitioning ? navigation.state : null
 
-    const oldKey =
-      transitioningFromState &&
-      transitioningFromState.routes[transitioningFromState.index].key
+    const oldKey = transitioningFromState && getKey(transitioningFromState)
     const outgoingDescriptor = oldKey && transitioningFromDescriptors[oldKey]
     const outgoingOptions = outgoingDescriptor && outgoingDescriptor.options
     const outgoingHasManagedTransition =
@@ -230,10 +209,10 @@ export default class Transitioner extends React.Component {
     const style = [{ flex: 1, ...StyleSheet.absoluteFillObject }]
 
     const passdownProps = {
+      isTransitioning,
       transitions,
       transitioningFromState,
       transitioningToState,
-      transitionRouteKey,
       style,
     }
 
