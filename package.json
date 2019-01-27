@@ -1,6 +1,6 @@
 {
   "name": "react-navigation-switch-transitioner",
-  "version": "0.0.8",
+  "version": "0.1.0",
   "description": "A react-navigation transitioner and switch navigator using it",
   "repository": "https://https://github.com/elyalvarado/react-navigation-switch-transitioner",
   "author": "Ely Alvarado",

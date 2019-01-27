@@ -5,10 +5,10 @@ module.exports = {
    * Navigators
    */
   get createSwitchNavigator() {
-    return require('./navigators/createContainedSwitchNavigator').default
-  },
-  get createUncontainedSwitchNavigator() {
     return require('./navigators/createSwitchNavigator').default
+  },
+  get createContainedSwitchNavigator() {
+    return require('./navigators/createContainedSwitchNavigator').default
   },
 
   /**

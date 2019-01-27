@@ -7,7 +7,7 @@ import {
 } from 'react-native'
 import {
   FadeTransition,
-  createSwitchNavigator,
+  createContainedSwitchNavigator,
   withFadeTransition,
 } from 'react-navigation-switch-transitioner'
 import { createStackNavigator } from 'react-navigation'
@@ -111,7 +111,7 @@ const AnotherNavigator = createStackNavigator({
   HomeScreen,
 })
 
-export default createSwitchNavigator(
+export default createContainedSwitchNavigator(
   {
     HomeScreen: AnotherNavigator,
     AnotherScreen,
