@@ -239,24 +239,42 @@ export default class Transitioner extends React.Component {
           screenProps,
         }
 
+    const screens = [
+      (
+        <IncomingScreen
+          {...incomingProps}
+          navigation={incomingDescriptor.navigation}
+          key={activeKey}
+        />
+      )
+    ]
+
+    if(OutgoingScreen) {
+      const outgoingWithProps = (
+        <OutgoingScreen
+          {...outgoingProps}
+          navigation={outgoingDescriptor.navigation}
+          key={oldKey}
+        />
+      )
+      // The outgoing screen is on top if the incoming screen has no managed
+      // transition but the outgoing has one, else is below the incoming one.
+      // This allows showing a transition on transitioning to screens with
+      // nested navigators coming from a simple screen.
+      if(!incomingHasManagedTransition && outgoingHasManagedTransition) {
+        screens.push(outgoingWithProps)
+      } else {
+        screens.unshift(outgoingWithProps)
+      }
+    }
+
     return (
       <Animated.View
         style={[...style, { ...backScreenStyles }]}
         pointerEvents="auto"
       >
         <NavigationProvider value={incomingDescriptor.navigation}>
-          {OutgoingScreen ? (
-            <OutgoingScreen
-              {...outgoingProps}
-              navigation={outgoingDescriptor.navigation}
-              key={oldKey}
-            />
-          ) : null}
-          <IncomingScreen
-            {...incomingProps}
-            navigation={incomingDescriptor.navigation}
-            key={activeKey}
-          />
+          { [ ...screens ] }
         </NavigationProvider>
       </Animated.View>
     )
