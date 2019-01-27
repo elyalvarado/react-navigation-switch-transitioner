@@ -15,6 +15,7 @@
       "always",
       { "ignoreClassFields": true }
     ],
+    "react/prop-types": [0],
     "no-underscore-dangle": "off",
     "no-console": "off"
   },
